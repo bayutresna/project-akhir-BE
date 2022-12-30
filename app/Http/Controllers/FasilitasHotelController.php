@@ -122,7 +122,7 @@ class FasilitasHotelController extends Controller
         }
 
         $fasilitashotel->isdeleted = true;
-
+        $fasilitashotel->save();
         return response()->json([
             "status" => true,
             "message" => "Data Terhapus",

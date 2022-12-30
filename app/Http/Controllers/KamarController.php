@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FasilitasKamar;
 use App\Models\Kamar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KamarController extends Controller
 {
@@ -70,6 +72,17 @@ class KamarController extends Controller
         $payload['foto'] = $path;
 
         $kamar = Kamar::query()->create($payload);
+
+        $payload['fasilitas'] = explode(',', $payload['fasilitas']);
+        // dd($payload['fasilitas']);
+        foreach($payload['fasilitas'] as $f){
+            FasilitasKamar::create([
+                'id_kamar' => $kamar->id,
+                'id_fasilitas' => $f
+
+            ]);
+        }
+
         return response()->json([
             "status" => true,
             "message" => "data tersimpan",
@@ -117,6 +130,18 @@ class KamarController extends Controller
         $kamar->fill($payload);
         $kamar->save();
 
+        FasilitasKamar::where('id_kamar', $kamar->id)->delete();
+
+        foreach($payload['fasilitas'] as $f){
+            FasilitasKamar::create([
+                'id_kamar' => $kamar->id,
+                'id_fasilitas' => $f
+
+            ]);
+        }
+
+
+
         return response()->json([
             "status" => true,
             "message" => "perubahan data tersimpan",
@@ -138,7 +163,7 @@ class KamarController extends Controller
 
 
         $kamar->isdeleted=true;
-
+        $kamar->save();
         return response()->json([
             "status" => true,
             "message" => "Data Terhapus",

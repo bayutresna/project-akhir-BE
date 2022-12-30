@@ -40,7 +40,47 @@ class GalleryController extends Controller
         ]);
     }
 
-    function delete($id){
+    function update(Request $request, $id)
+    {
+        $Gallery = Gallery::query()->where("id", $id)->where('isdeleted',false)->first();
+        if (!isset($Gallery)) {
+            return response()->json([
+                "status" => false,
+                "message" => "data tidak ditemukan",
+                "data" => null
+            ]);
+        }
+
+        $payload = $request->all();
+        $file = $request->file('foto');
+
+        if ($file) {
+
+            $file = $request->file('foto');
+            if ($file) {
+
+                $filename = $file->hashName();
+                $file->move("Gallery", $filename);
+                //pembuatan url foto
+                $path = $request->getSchemeAndHttpHost() . "/gallery/" . $filename;
+                //end pembuatan url foto
+
+            }
+            $payload['foto'] = $path;
+        }
+
+
+        $Gallery->fill($payload);
+        $Gallery->save();
+
+        return response()->json([
+            "status" => true,
+            "message" => "perubahan data tersimpan",
+            "data" => $Gallery
+        ]);
+    }
+
+    function destroy($id){
         $galeri = Gallery::query()->where('id', $id)->first();
         $galeri->isdeleted = true;
         $galeri->save();
