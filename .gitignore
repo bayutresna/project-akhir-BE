@@ -2,6 +2,9 @@
 /public/build
 /public/hot
 /public/storage
+public/FasilitasHotel
+public/Kamar
+public/gallery
 /storage/*.key
 /vendor
 .env
