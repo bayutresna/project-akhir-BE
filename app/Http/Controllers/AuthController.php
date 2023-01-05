@@ -48,7 +48,7 @@ class AuthController extends Controller
     }
 
     function getUser(Request $req){
-        $user = User::with('role')->get()->where('isdeleted',false);
+        $user = $req->user();
         return response()->json([
             'status' => true,
             'message' => '',
@@ -84,8 +84,9 @@ class AuthController extends Controller
         ]);
     }
 
-    function logout(){
-        $user = Auth::user();
-        $user->tokens()->delete();
+    function logout(Request $request){
+        Auth::user()->tokens()->delete();
+        $user = $request->user()->currentAccessToken()->delete();
+        
     }
 }

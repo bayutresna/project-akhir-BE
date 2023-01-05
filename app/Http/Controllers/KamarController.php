@@ -11,7 +11,7 @@ class KamarController extends Controller
 {
     function index()
     {
-        $kamar = Kamar::with(['tipe','fasilitas'])->get()->where('isdeleted',false);
+        $kamar = Kamar::with(['tipe','fasilitas'])->where('isdeleted',false)->get();
 
         return response()->json([
             "status" => true,
@@ -22,7 +22,7 @@ class KamarController extends Controller
 
     function show($id)
     {
-        $kamar = Kamar::query()->where("id", $id)->first();
+        $kamar = Kamar::with(['tipe','fasilitas'])->where("id", $id)->first();
         if (!isset($kamar)) {
             return response()->json([
                 "status" => false,
@@ -105,43 +105,45 @@ class KamarController extends Controller
 
         $file = $request->file('foto');
 
-
-
         if ($file) {
 
-            $file = $request->file('foto');
-            if ($file) {
-
-                $filename = $file->hashName();
-                $file->move("Kamar", $filename);
-                //pembuatan url foto
-                $path = $request->getSchemeAndHttpHost() . "/Kamar/" . $filename;
-                //end pembuatan url foto
-
-                //untuk memasukan posisi foto pada storage
-
-                //end memasukan posisi foto pada storage
-
-            }
+            $filename = $file->hashName();
+            $file->move("Kamar", $filename);
+            $path = $request->getSchemeAndHttpHost() . "/Kamar/" . $filename;
             $payload['foto'] = $path;
-        }
+            $kamar->fill($payload);
+            $kamar->save();
 
+            if($payload['fasilitas'] != null){
+                FasilitasKamar::where('id_kamar', $kamar->id)->delete();
+                $payload['fasilitas'] = explode(',', $payload['fasilitas']);
+                foreach($payload['fasilitas'] as $f){
+                    FasilitasKamar::create([
+                        'id_kamar' => $kamar->id,
+                        'id_fasilitas' => $f
+                    ]);
+                }
+            }
+            return response()->json([
+                "status" => true,
+                "message" => "perubahan data tersimpan",
+                "data" => $kamar
+            ]);
+        }
 
         $kamar->fill($payload);
         $kamar->save();
 
-        FasilitasKamar::where('id_kamar', $kamar->id)->delete();
-
-        foreach($payload['fasilitas'] as $f){
-            FasilitasKamar::create([
-                'id_kamar' => $kamar->id,
-                'id_fasilitas' => $f
-
-            ]);
+        if($payload['fasilitas'] != null){
+            FasilitasKamar::where('id_kamar', $kamar->id)->delete();
+            $payload['fasilitas'] = explode(',', $payload['fasilitas']);
+            foreach($payload['fasilitas'] as $f){
+                FasilitasKamar::create([
+                    'id_kamar' => $kamar->id,
+                    'id_fasilitas' => $f
+                ]);
+            }
         }
-
-
-
         return response()->json([
             "status" => true,
             "message" => "perubahan data tersimpan",

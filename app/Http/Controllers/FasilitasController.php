@@ -18,23 +18,23 @@ class FasilitasController extends Controller
         ]);
     }
 
-    // function show($id)
-    // {
-    //     $fasilitas = Fasilitas::query()->where("id", $id)->first();
-    //     if (!isset($fasilitas)) {
-    //         return response()->json([
-    //             "status" => false,
-    //             "message" => "data tidak ditemukan",
-    //             "data" => null
-    //         ]);
-    //     }
+    function show($id)
+    {
+        $fasilitas = Fasilitas::query()->where("id", $id)->where('isdeleted',false)->first();
+        if (!isset($fasilitas)) {
+            return response()->json([
+                "status" => false,
+                "message" => "data tidak ditemukan",
+                "data" => null
+            ]);
+        }
 
-    //     return response()->json([
-    //         "status" => true,
-    //         "message" => "ini Fasilitas",
-    //         "data" => $fasilitas
-    //     ]);
-    // }
+        return response()->json([
+            "status" => true,
+            "message" => "ini Fasilitas",
+            "data" => $fasilitas
+        ]);
+    }
 
     function store(Request $request)
     {
@@ -74,80 +74,68 @@ class FasilitasController extends Controller
         ]);
     }
 
-    // function update(Request $request, $id)
-    // {
-    //     $fasilitas = Fasilitas::query()->where("id", $id)->first();
-    //     if (!isset($fasilitas)) {
-    //         return response()->json([
-    //             "status" => false,
-    //             "message" => "data tidak ditemukan",
-    //             "data" => null
-    //         ]);
-    //     }
+    function update(Request $request, $id)
+    {
+        $fasilitas = Fasilitas::query()->where("id", $id)->first();
+        if (!isset($fasilitas)) {
+            return response()->json([
+                "status" => false,
+                "message" => "data tidak ditemukan",
+                "data" => null
+            ]);
+        }
 
-    //     $payload = $request->all();
+        $payload = $request->all();
 
-    //     $file = $request->file('foto');
-    //     $temp = $fasilitas->imgurl;
+        $file = $request->file('logo');
 
+        if ($file) {
 
-    //     if ($file) {
+            $file = $request->file('logo');
+            if ($file) {
 
-    //         $file = $request->file('foto');
-    //         if ($file) {
-
-    //             $filename = $file->hashName();
-    //             $file->move("Fasilitas", $filename);
-    //             //pembuatan url foto
-    //             $path = $request->getSchemeAndHttpHost() . "/Fasilitas/" . $filename;
-    //             //end pembuatan url foto
-
-    //             //untuk memasukan posisi foto pada storage
-    //             $path3 = $request->getSchemeAndHttpHost() . "Fasilitas/" . $filename;
-    //             $path2 = str_replace($request->getSchemeAndHttpHost(), "", $path3);
-    //             //end memasukan posisi foto pada storage
-
-    //         }
+                $filename = $file->hashName();
+                $file->move("Fasilitas", $filename);
+                //pembuatan url foto
+                $path = $request->getSchemeAndHttpHost() . "/Fasilitas/" . $filename;
+                //end pembuatan url foto
+            }
 
 
-    //         $payload['foto'] = $path;
-    //         $payload['imgurl'] = $path2;
-    //         unlink($temp);
-    //     }
+            $payload['logo'] = $path;
+
+        }
 
 
-    //     $fasilitas->fill($payload);
-    //     $fasilitas->save();
+        $fasilitas->fill($payload);
+        $fasilitas->save();
 
-    //     return response()->json([
-    //         "status" => true,
-    //         "message" => "perubahan data tersimpan",
-    //         "data" => $fasilitas
-    //     ]);
-    // }
+        return response()->json([
+            "status" => true,
+            "message" => "perubahan data tersimpan",
+            "data" => $fasilitas
+        ]);
+    }
 
-    // function destroy(Request $request, $id)
-    // {
-    //     $fasilitas = Fasilitas::query()->where("id", $id)->first();
+    function destroy(Request $request, $id)
+    {
+        $fasilitas = Fasilitas::query()->where("id", $id)->first();
 
-    //     if (!isset($fasilitas)) {
-    //         return response()->json([
-    //             "status" => false,
-    //             "message" => "data tidak ditemukan",
-    //             "data" => null
-    //         ]);
-    //     }
+        if (!isset($fasilitas)) {
+            return response()->json([
+                "status" => false,
+                "message" => "data tidak ditemukan",
+                "data" => null
+            ]);
+        }
 
+        $fasilitas->isdeleted = true;
+        $fasilitas->save();
 
-    //     unlink($fasilitas->imgurl);
-
-
-    //     $fasilitas->delete();
-
-    //     return response()->json([
-    //         "status" => true,
-    //         "message" => "Data Terhapus",
-    //         "data" => $fasilitas
-    //     ]);
-    // }
+        return response()->json([
+            "status" => true,
+            "message" => "Data Terhapus",
+            "data" => $fasilitas
+        ]);
+    }
 }

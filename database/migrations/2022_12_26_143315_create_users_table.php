@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('kewarganegaraan')->nullable();
             $table->string('nohp')->nullable();
             $table->boolean('isdeleted')->default(false);
+            $table->rememberToken();
             $table->timestamps();
         });
     }

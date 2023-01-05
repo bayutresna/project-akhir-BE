@@ -19,12 +19,13 @@ return new class extends Migration
             $table->bigInteger('id_kamar');
             $table->date('tanggal_cekin');
             $table->date('tanggal_cekout');
+            $table->integer('jumlah_kamar');
             $table->float('biaya');
             $table->string('metode_pembayaran');
             $table->Boolean('status_pembayaran')->default(false);
-            $table->string('status_transaksi')->nullable();
+            $table->string('status_transaksi')->default('Belum Selesai');
             $table->text('bukti_pembayaran')->nullable();
-            $table->tinyInteger('is_extra_bed')->default(0);
+            $table->tinyInteger('is_extra_bed');
             $table->boolean('isdeleted')->default(false);
             $table->timestamps();
         });
